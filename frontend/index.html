@@ -1,19 +1,101 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: frontend
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: frontend
-  template:
-    metadata:
-      labels:
-        app: frontend
-    spec:
-      containers:
-        - name: frontend
-          image: milenaa98/microservices-frontend:v7
-          ports:
-            - containerPort: 80
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Notes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            padding-top: 50px;
+        }
+        .container {
+            background: white;
+            width: 400px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            resize: none;
+            padding: 10px;
+        }
+        button {
+            width: 100%;
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        ul {
+            margin-top: 20px;
+            padding-left: 20px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Notes</h1>
+
+    <textarea id="note" placeholder="Any thoughts...?"></textarea>
+    <button onclick="addNote()">Save</button>
+
+    <ul id="notes"></ul>
+</div>
+
+<script>
+    const backendUrl = "http://localhost:30007/items";
+
+    function loadNotes() {
+        fetch(backendUrl)
+            .then(res => res.json())
+            .then(data => {
+                const list = document.getElementById("notes");
+                list.innerHTML = "";
+                data.forEach(item => {
+                    addNoteToList(item[1]);
+                });
+            });
+    }
+
+    function addNote() {
+        const textarea = document.getElementById("note");
+        const text = textarea.value.trim();
+
+        if (text === "") return;
+
+        fetch(backendUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: text })
+        })
+        .then(() => {
+            addNoteToList(text);
+            textarea.value = "";   
+        });
+    }
+
+    function addNoteToList(text) {
+        const list = document.getElementById("notes");
+        const li = document.createElement("li");
+        li.innerText = text;
+        list.prepend(li); 
+    }
+
+    loadNotes();
+</script>
+
+
+</body>
+</html>
