@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: milenaa98/microservices-frontend:v4
+          image: milenaa98/microservices-frontend:v7
           ports:
             - containerPort: 80
